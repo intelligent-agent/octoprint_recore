@@ -7,23 +7,50 @@
 $(function() {
     function RefactorViewModel(parameters) {
         var self = this;
+        self.settings = parameters[0];
+        self.versions = new ItemListHelper(
+            "plugin_refactor_versions",
+            {},
+            {},
+            "name",
+            [],
+            [],
+            5
+        );
 
-        // assign the injected parameters, e.g.:
-        // self.loginStateViewModel = parameters[0];
-        // self.settingsViewModel = parameters[1];
+        self.onBeforeBinding = function() {
+            self.requestData();
+        }
 
-        // TODO: Implement your plugin's view model here.
+        self.fromResponse = function(data) {
+            var versions = [];
+            _.each(_.keys(data), function(key) {
+                versions.push({
+                    key: key,
+                    name: ko.observable(data[key].name),
+                    version: ko.observable(data[key].version)
+                });
+            });
+            self.versions.updateItems(versions);
+        };
+
+        self.requestData = function() {
+          $.ajax({
+            url: API_BASEURL + "plugin/refactor",
+            type:"POST",
+            dataType: "json",
+            contentType: "application/json; charset=UTF-8",
+            data: JSON.stringify({
+                "command": "get_versions"
+            }),
+            success: self.fromResponse
+          });
+        };
     }
 
-    /* view model class, parameters for constructor, container to bind to
-     * Please see http://docs.octoprint.org/en/master/plugins/viewmodels.html#registering-custom-viewmodels for more details
-     * and a full list of the available options.
-     */
     OCTOPRINT_VIEWMODELS.push({
         construct: RefactorViewModel,
-        // ViewModels your plugin depends on, e.g. loginStateViewModel, settingsViewModel, ...
-        dependencies: [ /* "loginStateViewModel", "settingsViewModel" */ ],
-        // Elements to bind to, e.g. #settings_plugin_refactor, #tab_plugin_refactor, ...
-        elements: [ /* ... */ ]
+        dependencies: [ "settingsViewModel"  ],
+        elements: ["#tab_plugin_refactor"]
     });
 });

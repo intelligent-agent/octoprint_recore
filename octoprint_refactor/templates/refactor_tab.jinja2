@@ -1,0 +1,19 @@
+<h4>{{ _('Refactor') }}</h4>
+This tab holds information about the software installed by Refactor. You can use this
+when asking for help on discord.
+
+<h4>{{ _('Versions') }}</h4>
+<table class="table table-striped table-hover table-condensed table-hover">
+    <thead>
+    <tr>
+        <th class="versions_plugin_refactor_versions_name">{{ _('Name') }}</th>
+        <th class="versions_plugin_refactor_versions_actions">{{ _('Version') }}</th>
+    </tr>
+    </thead>
+    <tbody data-bind="foreach: versions.paginatedItems">
+        <tr data-bind="attr: {title: name}">
+            <td class="versions_plugin_refactor_versions_name" data-bind="text: name"></td>
+            <td class="versions_plugin_refactor_versions_version" data-bind="text: version"></td>
+        </tr>
+    </tbody>
+</table>
