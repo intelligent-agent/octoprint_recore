@@ -32,6 +32,9 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
         return [
         ]
 
+    def get_template_vars(self):
+        return dict(rootfs=self.get_rootfs())
+
     def get_assets(self):
         # Define your plugin's asset files to automatically include in the
         # core UI here.
@@ -59,7 +62,6 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
                     "version": self.get_klipper_version()
                 }
             }
-            self._logger.info(versions)
             return flask.jsonify(**versions)
 
     def on_api_get(self, request):
@@ -77,8 +79,22 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
         try:
             return subprocess.check_output(path.split()).strip()
         except subprocess.CalledProcessError:
-            return "Uknown"
+            return "Unknown"
 
+    def get_rootfs(self):
+        import re
+        for line in open("/proc/mounts", 'r'):
+            if re.search('/ ', line):
+                if "mmcblk" in line:
+                    return "emmc"
+                elif "sd" in line:
+                    return "usb"
+                elif "nvme" in line:
+                    return "nvme"
+                else:
+                    return line
+                if line == None:
+                    return 'Unknown'
 
     ##~~ Softwareupdate hook
 

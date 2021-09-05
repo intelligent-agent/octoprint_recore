@@ -17,3 +17,19 @@ when asking for help on discord.
         </tr>
     </tbody>
 </table>
+
+<h4>{{ _('Boot Media') }}</h4>
+You are currently running Refactor from
+{% if plugin_refactor_rootfs == "sd" %}
+  <b>USB</b><br>
+  <b>You can install to eMMC</b><br>
+{% else %}
+  {% if plugin_refactor_rootfs == "nvme" %}
+    <b>NVME</b><br>
+  {% elif plugin_refactor_rootfs == "emmc" %}
+    <b>eMMC</b><br>
+  {% else %}
+    <b>{{plugin_refactor_rootfs}}</b><br>
+  {% endif %}
+    <b>You can not install to other media</b>
+{% endif %}

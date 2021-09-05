@@ -22,18 +22,6 @@ $(function() {
             self.requestData();
         }
 
-        self.fromResponse = function(data) {
-            var versions = [];
-            _.each(_.keys(data), function(key) {
-                versions.push({
-                    key: key,
-                    name: ko.observable(data[key].name),
-                    version: ko.observable(data[key].version)
-                });
-            });
-            self.versions.updateItems(versions);
-        };
-
         self.requestData = function() {
           $.ajax({
             url: API_BASEURL + "plugin/refactor",
@@ -43,14 +31,25 @@ $(function() {
             data: JSON.stringify({
                 "command": "get_versions"
             }),
-            success: self.fromResponse
+            success: function(data) {
+                var versions = [];
+                _.each(_.keys(data), function(key) {
+                    versions.push({
+                        key: key,
+                        name: ko.observable(data[key].name),
+                        version: ko.observable(data[key].version)
+                    });
+                });
+                self.versions.updateItems(versions);
+            }
           });
         };
     }
 
+
     OCTOPRINT_VIEWMODELS.push({
         construct: RefactorViewModel,
-        dependencies: [ "settingsViewModel"  ],
+        dependencies: [ "settingsViewModel" ],
         elements: ["#tab_plugin_refactor"]
     });
 });
