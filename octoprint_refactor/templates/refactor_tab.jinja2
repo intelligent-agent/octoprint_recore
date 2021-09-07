@@ -62,3 +62,21 @@ In this section, you can choose which drive to boot from.
     </div>
   </div>
 </div>
+
+<h4>{{ _('Flash Refactor to eMMC') }}</h4>
+If you are running from USB you can flash Refactor to the eMMC on Recore.
+This will overwrite all config files on the eMMC, so make sure you save a copy
+of the Klipper config file on your local computer.
+<label><b>Choose Refactor version</b></label>
+
+<select data-bind="options: availableRefactorVersions, optionsText: function(item) {
+                       return item.name
+                   },
+                    value: selectedVersion,"></select>
+<button class="btn btn-primary" data-bind="click: installSelectedVersion">Install</button>
+
+<div data-bind=", if: isDownloading()">
+<div data-bind="style: { width: downloadProgress }" style="height: 20px; background-color: blue;"></div>
+Downloading <span data-bind="text: selectedVersion().name"></span>
+<button style="float: right;" class="btn btn-primary" data-bind="click: cancelDownload">Cancel</button>
+</div>

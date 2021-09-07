@@ -40,7 +40,6 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
     def get_template_vars(self):
         return {
             "rootfs": self.refactor.get_rootfs(),
-            "next_rootfs": self.refactor.get_boot_media(),
             "usb_present": self.refactor.is_usb_present(),
             "emmc_present": self.refactor.is_emmc_present()
         }
@@ -58,7 +57,9 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
         return dict(
             get_data=[],
             change_boot_media=[],
+            download_refactor=["refactor_version"],
             install_refactor=[],
+            cancel_download=[],
             get_install_progress=[]
         )
 
@@ -76,7 +77,8 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
                         "version": self.refactor.get_klipper_version()
                     }
                 },
-                "boot_media": self.refactor.get_boot_media()
+                "boot_media": self.refactor.get_boot_media(),
+                "releases": self.refactor.get_releases()
             }
             return flask.jsonify(**data)
         elif command == "change_boot_media":
@@ -85,17 +87,27 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
                 "boot_media": self.refactor.get_boot_media()
             }
             return flask.jsonify(**status)
-        elif command == "install_refactor":
+        elif command == "download_refactor":
+            self.refactor_version = data["refactor_version"]
+            self.refactor.install_version(self.refactor_version)
             status = {
+                    "success": True
             }
             return flask.jsonify(**status)
+        elif command == "install_refactor":
+            self.refactor.install_refactor()
+            return flask.jsonify(**{"success": True})
+        elif command == "cancel_download":
+            self.refactor.cancel_download()
+            status = {"success": True}
+            return flask.jsonify(**status)
         elif command == "get_install_progress":
-            progress = {
-            }
+            progress = self.refactor.get_download_progress()
             return flask.jsonify(**progress)
 
     def on_api_get(self, request):
         return flask.jsonify(foo="bar")
+
 
     ##~~ Softwareupdate hook
 
