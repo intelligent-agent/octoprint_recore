@@ -52,9 +52,9 @@ class Refactor:
 
     def change_boot_media(self):
         if self.get_boot_media() == "emmc":
-            os.system("sudo ./set-boot-media usb")
+            os.system("sudo /sbin/set-boot-media usb")
         else:
-            os.system("sudo ./set-boot-media emmc")
+            os.system("sudo /sbin/set-boot-media emmc")
 
     def is_usb_present(self):
         if self.get_rootfs() == "usb":
