@@ -15,3 +15,9 @@ the plugin manager.
 ## Configuration
 
 **TODO:** Describe your plugin's configuration options (if any).
+
+TODO:
+automatically mount /dev/mmcblk0p1 on /mnt/ if booting from USB
+automatically mount /dev/sda1 on /mnt/ if booting from eMMC
+
+give debian sudo access to /sbin/set-boot-media
