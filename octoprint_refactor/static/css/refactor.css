@@ -1,1 +1,11 @@
 /* TODO: Have your plugin's CSS files generated to here. */
+.boot-media {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 49%;
+}
+
+#images{
+    text-align:center;
+}

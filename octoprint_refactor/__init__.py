@@ -11,6 +11,7 @@ from __future__ import absolute_import
 
 import octoprint.plugin
 import flask
+from .refactor import Refactor
 
 class RefactorPlugin(octoprint.plugin.SettingsPlugin,
     octoprint.plugin.AssetPlugin,
@@ -20,12 +21,16 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
 ):
 
     def on_after_startup(self):
+        settings = self._settings
+        self.refactor = Refactor(settings)
         self._logger.info("Refactor plugin!")
+
 
     def get_settings_defaults(self):
         return {
             "version_file": "/etc/refactor.version",
-            "klipper_dir": "/home/debian/klipper"
+            "klipper_dir": "/home/debian/klipper",
+            "install_script": "/root/install_refactor.sh"
         }
 
     def get_template_configs(self):
@@ -33,7 +38,12 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
         ]
 
     def get_template_vars(self):
-        return dict(rootfs=self.get_rootfs())
+        return {
+            "rootfs": self.refactor.get_rootfs(),
+            "next_rootfs": self.refactor.get_boot_media(),
+            "usb_present": self.refactor.is_usb_present(),
+            "emmc_present": self.refactor.is_emmc_present()
+        }
 
     def get_assets(self):
         # Define your plugin's asset files to automatically include in the
@@ -46,55 +56,46 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
 
     def get_api_commands(self):
         return dict(
-            get_versions=[]
+            get_data=[],
+            change_boot_media=[],
+            install_refactor=[],
+            get_install_progress=[]
         )
 
     def on_api_command(self, command, data):
         import flask
-        if command == "get_versions":
-            versions = {
-                "refactor": {
-                    "name": "Refactor",
-                    "version": self.get_refactor_version()
+        if command == "get_data":
+            data = {
+                "versions": {
+                    "refactor": {
+                        "name": "Refactor",
+                        "version": self.refactor.get_refactor_version()
+                    },
+                    "klipper": {
+                        "name": "Klipper",
+                        "version": self.refactor.get_klipper_version()
+                    }
                 },
-                "klipper": {
-                    "name": "Klipper",
-                    "version": self.get_klipper_version()
-                }
+                "boot_media": self.refactor.get_boot_media()
             }
-            return flask.jsonify(**versions)
+            return flask.jsonify(**data)
+        elif command == "change_boot_media":
+            self.refactor.change_boot_media()
+            status = {
+                "boot_media": self.refactor.get_boot_media()
+            }
+            return flask.jsonify(**status)
+        elif command == "install_refactor":
+            status = {
+            }
+            return flask.jsonify(**status)
+        elif command == "get_install_progress":
+            progress = {
+            }
+            return flask.jsonify(**progress)
 
     def on_api_get(self, request):
         return flask.jsonify(foo="bar")
-
-    def get_refactor_version(self):
-        with open("/etc/refactor.version", "r") as f:
-            version = f.read().replace("\n", "")
-            return version
-
-    def get_klipper_version(self):
-        import subprocess
-        klipper_dir = self._settings.get(["klipper_dir"])
-        path = "git -C "+klipper_dir+" describe --always --tags --long --dirty"
-        try:
-            return subprocess.check_output(path.split()).strip()
-        except subprocess.CalledProcessError:
-            return "Unknown"
-
-    def get_rootfs(self):
-        import re
-        for line in open("/proc/mounts", 'r'):
-            if re.search('/ ', line):
-                if "mmcblk" in line:
-                    return "emmc"
-                elif "sd" in line:
-                    return "usb"
-                elif "nvme" in line:
-                    return "nvme"
-                else:
-                    return line
-                if line == None:
-                    return 'Unknown'
 
     ##~~ Softwareupdate hook
 

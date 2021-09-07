@@ -19,17 +19,46 @@ when asking for help on discord.
 </table>
 
 <h4>{{ _('Boot Media') }}</h4>
-You are currently running Refactor from
-{% if plugin_refactor_rootfs == "usb" %}
-  <b>USB</b><br>
-  <b>You can install to eMMC</b><br>
-{% else %}
-  {% if plugin_refactor_rootfs == "nvme" %}
-    <b>NVME</b><br>
-  {% elif plugin_refactor_rootfs == "emmc" %}
+Refactor can run from either the internal eMMC drive or from a USB drive.
+In this section, you can choose which drive to boot from.
+<div id="images">
+  <div class="boot-media">
     <b>eMMC</b><br>
-  {% else %}
-    <b>{{plugin_refactor_rootfs}}</b><br>
-  {% endif %}
-    <b>You can not install to other media</b>
-{% endif %}
+    <img src="/plugin/refactor/static/img/eMMC.png" /><br>
+    <b>
+    {% if plugin_refactor_rootfs == "emmc" %}
+      Currently running from eMMC
+    {% else %}
+      Present
+    {% endif %}
+    </b><br>
+
+    <div data-bind="if: bootMedia() == 'emmc'">
+      <b>After a reboot will run from eMMC</b>
+    </div>
+    <div data-bind="ifnot: bootMedia() == 'emmc'">
+      <button class="btn btn-primary" data-bind="click: changeBootMedia">Run from eMMC</button>
+    </div>
+  </div>
+  <div class="boot-media">
+    <b>USB drive</b><br>
+    <img src="/plugin/refactor/static/img/USB.png" /><br>
+    <b>
+    {% if plugin_refactor_rootfs == "usb" %}
+      Currently running from USB drive
+    {% else %}
+      {% if plugin_refactor_usb_present  %}
+        Present
+      {% else %}
+        Not present
+      {% endif %}
+    {% endif %}
+    </b><br>
+    <div data-bind="if: bootMedia() == 'usb'">
+      <b>After a reboot will run from USB drive</b>
+    </div>
+    <div data-bind="ifnot: bootMedia() == 'usb'">
+      <button class="btn btn-primary" data-bind="click: changeBootMedia">Run from USB drive</button>
+    </div>
+  </div>
+</div>
