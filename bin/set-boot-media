@@ -3,16 +3,14 @@
 BOOTDEVICE_USB="extraargs=root=/dev/sda1"
 BOOTDEVICE_EMMC="extraargs=root=/dev/mmcblk0p1"
 BOOT_ARGS_FILE="/boot/armbianEnv.txt"
+EMMC_BOOT_ARGS_FILE = "/mnt/emmc/"+BOOT_ARGS_FILE
+USB_BOOT_ARGS_FILE = "/mnt/usb/"+BOOT_ARGS_FILE
 
 import sys
 
 class SetBootMedia:
     def __init__(self, new_media):
         self.new_media = new_media
-        if self.get_rootfs() == "emmc":
-            self.boot_args_file_path = BOOT_ARGS_FILE
-        elif self.get_rootfs() == "usb":
-            self.boot_args_file_path = "/mnt"+BOOT_ARGS_FILE
 
         if new_media == "usb":
             self.set_boot_media(BOOTDEVICE_USB)
@@ -52,11 +50,11 @@ class SetBootMedia:
 
     def set_boot_media(self, new_boot_device):
         self.remove_boot_media()
-        with open(self.boot_args_file_path, 'a') as f:
+        with open(EMMC_BOOT_ARGS_FILE, 'a') as f:
             f.write(new_boot_device+"\n")
 
     def remove_boot_media(self):
-        with open(self.boot_args_file_path,"r+") as f:
+        with open(EMMC_BOOT_ARGS_FILE, "r+") as f:
             new_f = f.readlines()
             f.seek(0)
             for line in new_f:
@@ -67,12 +65,12 @@ class SetBootMedia:
     def is_usb_present(self):
         if self.get_rootfs() == "usb":
             return True
-        return os.path.isfile("/mnt"+BOOT_ARGS_FILE)
+        return os.path.isfile(USB_BOOT_ARGS_FILE)
 
     def is_emmc_present(self):
         if self.get_rootfs() == "emmc":
             return True
-        return os.path.isfile("/mnt"+BOOT_ARGS_FILE)
+        return os.path.isfile(EMMC_BOOT_ARGS_FILE)
 
 
 if __name__ == "__main__":
