@@ -16,6 +16,10 @@ class Refactor:
         self.bytes_downloaded = 0
         self.bytes_to_download = 1
         self.download_cancelled = False
+        self.is_download_finished = False
+        self.install_progress = 0
+        self.is_install_finished = False
+        self.install_error = ""
 
     def get_refactor_version(self):
         with open(self.refactor_version_file, "r") as f:
@@ -35,20 +39,27 @@ class Refactor:
         self.releases = requests.get("https://api.github.com/repos/intelligent-agent/Refactor/releases")
         return self.releases.json()
 
-    def install_version(self, refactor_version):
+    def get_local_releases(self):
+        import glob
+        images = [os.path.basename(f) for f in glob.glob("images/*.img.xz")]
+        return images
+
+    def download_version(self, refactor_version):
         print("Downloading version: "+refactor_version["name"])
         url = refactor_version["assets"][0]['browser_download_url']
         self.bytes_downloaded = 0
         self.download_cancelled = False
+        self.is_download_finished = False
         self.bytes_to_download = refactor_version["assets"][0]['size']
-        self.executor.submit(self.download_refactor, url)
+        filename = "Refactor-recore-"+refactor_version["name"]+".img.xz"
+        self.executor.submit(self.download_refactor, url, filename)
 
-    def download_refactor(self, url):
+    def download_refactor(self, url, filename):
         import requests
         # Answer by Dennis Patterson
         # https://stackoverflow.com/questions/53101597/how-to-download-binary-file-using-requests
         #
-        local_filename = "Refactor-recore.img.xz"
+        local_filename = "images/"+filename
         r = requests.get(url, stream=True)
         with open(local_filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=1024):
@@ -57,9 +68,7 @@ class Refactor:
                     self.bytes_downloaded += len(chunk)
                     if self.download_cancelled:
                         return
-
-    def install_refactor(self):
-        print("xz -v -d -c Refactor-recore.img.xz | dd of=/dev/mmcblk0")
+        self.is_download_finished = True
 
     def cancel_download(self):
         self.download_cancelled = True
@@ -67,7 +76,33 @@ class Refactor:
     def get_download_progress(self):
         return {
             "progress": (self.bytes_downloaded/self.bytes_to_download),
-            "cancelled": self.download_cancelled
+            "cancelled": self.download_cancelled,
+            "is_finished": self.is_download_finished
+        }
+
+    def install_version(self, filename):
+        print(f"installing {filename}")
+        self.install_progress = 0
+        self.is_install_finished = False
+        self.executor.submit(self.install_refactor, filename)
+
+    def install_refactor(self, filename):
+        infile = "./images/"+filename
+        if not os.path.isfile(infile):
+            self.install_error = "Chosen file is not present"
+            return
+        outfile = "./images/test.img.xz"
+        cmd = f"./bin/flash-recore {infile} '{outfile} bs=1c count=10000000'"
+        print(cmd)
+        #import subprocess
+        #print(subprocess.popen(cmd, stdout=PIPE).stdout.read())
+        self.install_progress = 100
+        self.is_install_finished = True
+
+    def get_install_progress(self):
+        return {
+            "progress": (self.install_progress),
+            "is_finished": self.is_install_finished
         }
 
     def get_rootfs(self):

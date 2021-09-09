@@ -4,18 +4,18 @@ when asking for help on discord.
 
 <h4>{{ _('Versions') }}</h4>
 <table class="table table-striped table-hover table-condensed table-hover">
-    <thead>
-    <tr>
-        <th class="versions_plugin_refactor_versions_name">{{ _('Name') }}</th>
-        <th class="versions_plugin_refactor_versions_actions">{{ _('Version') }}</th>
-    </tr>
-    </thead>
-    <tbody data-bind="foreach: versions.paginatedItems">
-        <tr data-bind="attr: {title: name}">
-            <td class="versions_plugin_refactor_versions_name" data-bind="text: name"></td>
-            <td class="versions_plugin_refactor_versions_version" data-bind="text: version"></td>
-        </tr>
-    </tbody>
+  <thead>
+  <tr>
+      <th class="versions_plugin_refactor_versions_name">{{ _('Name') }}</th>
+      <th class="versions_plugin_refactor_versions_actions">{{ _('Version') }}</th>
+  </tr>
+  </thead>
+  <tbody data-bind="foreach: programVersions">
+      <tr data-bind="attr: {title: name}">
+          <td class="versions_plugin_refactor_versions_name" data-bind="text: name"></td>
+          <td class="versions_plugin_refactor_versions_version" data-bind="text: version"></td>
+      </tr>
+  </tbody>
 </table>
 
 <h4>{{ _('Boot Media') }}</h4>
@@ -63,20 +63,54 @@ In this section, you can choose which drive to boot from.
   </div>
 </div>
 
-<h4>{{ _('Flash Refactor to eMMC') }}</h4>
+
+<h4>{{ _('Download Refactor') }}</h4>
+If you are running from a USB drive, you can download Refactor to the USB and
+have it ready for flashing.
+<div id="images">
+  <div class="boot-media">
+    <b>GitHub</b><br>
+    <img src="/plugin/refactor/static/img/GitHub.png" /><br>
+  </div>
+  <div class="boot-media">
+    <b>USB drive</b><br>
+    <img src="/plugin/refactor/static/img/USB.png" /><br>
+  </div>
+</div>
+<h5>Checklist</h5>
+<div> (✓) You are Running from a USB drive</div>
+<div> (✓) You have at least 1.5 GB of space</div>
+<div data-bind="ifnot: isDownloading()">
+  <label><b>Choose Refactor version to download</b></label>
+  <select data-bind="options: remoteRefactorVersions, optionsText: function(item) {
+                         return item.name
+                     },
+                      value: remoteSelectedVersion"></select>
+  <button class="btn btn-primary" data-bind="click: downloadSelectedVersion">Download</button>
+</div>
+<div data-bind="if: isDownloading()">
+  <div data-bind="style: { width: downloadProgress }" style="height: 20px; background-color: blue;"></div>
+  Downloading <span data-bind="text: remoteSelectedVersion().name"></span>
+  <button style="float: right;" class="btn btn-primary" data-bind="click: cancelDownload">Cancel</button>
+</div>
+
+
+<h4>{{ _('Flash Refactor') }}</h4>
 If you are running from USB you can flash Refactor to the eMMC on Recore.
 This will overwrite all config files on the eMMC, so make sure you save a copy
 of the Klipper config file on your local computer.
-<label><b>Choose Refactor version</b></label>
-
-<select data-bind="options: availableRefactorVersions, optionsText: function(item) {
-                       return item.name
-                   },
-                    value: selectedVersion,"></select>
-<button class="btn btn-primary" data-bind="click: installSelectedVersion">Install</button>
-
-<div data-bind=", if: isDownloading()">
-<div data-bind="style: { width: downloadProgress }" style="height: 20px; background-color: blue;"></div>
-Downloading <span data-bind="text: selectedVersion().name"></span>
-<button style="float: right;" class="btn btn-primary" data-bind="click: cancelDownload">Cancel</button>
+<h5>Checklist</h5>
+<div> (✓) You are Running from a USB drive</div>
+<div data-bind="ifnot: isInstalling()">
+  <label><b>Choose Refactor image to install</b></label>
+  <select data-bind="options: localRefactorVersions,
+                      value: localSelectedVersion,"></select>
+  <button class="btn btn-primary" data-bind="click: installSelectedVersion">Install</button>
+</div>
+<div data-bind="if: isInstalling()">
+  <div data-bind="style: { width: installProgress }" style="height: 20px; background-color: blue;"></div>
+  Installing <span data-bind="text: localSelectedVersion()"></span>
+</div>
+<div data-bind="if: isInstallFinished()">
+  Install finished! New reboot the board using the system command
 </div>

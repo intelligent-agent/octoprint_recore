@@ -21,10 +21,9 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
 ):
 
     def on_after_startup(self):
-        settings = self._settings
-        self.refactor = Refactor(settings)
+        self.settings = self._settings
+        self.refactor = Refactor(self.settings)
         self._logger.info("Refactor plugin!")
-
 
     def get_settings_defaults(self):
         return {
@@ -58,8 +57,9 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
             get_data=[],
             change_boot_media=[],
             download_refactor=["refactor_version"],
-            install_refactor=[],
+            install_refactor=["filename"],
             cancel_download=[],
+            get_download_progress=[],
             get_install_progress=[]
         )
 
@@ -67,18 +67,18 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
         import flask
         if command == "get_data":
             data = {
-                "versions": {
-                    "refactor": {
+                "versions": [ {
                         "name": "Refactor",
                         "version": self.refactor.get_refactor_version()
                     },
-                    "klipper": {
+                    {
                         "name": "Klipper",
                         "version": self.refactor.get_klipper_version()
                     }
-                },
+                ],
                 "boot_media": self.refactor.get_boot_media(),
-                "releases": self.refactor.get_releases()
+                "releases": self.refactor.get_releases(),
+                "locals": self.refactor.get_local_releases()
             }
             return flask.jsonify(**data)
         elif command == "change_boot_media":
@@ -89,20 +89,22 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
             return flask.jsonify(**status)
         elif command == "download_refactor":
             self.refactor_version = data["refactor_version"]
-            self.refactor.install_version(self.refactor_version)
-            status = {
-                    "success": True
-            }
+            self.refactor.download_version(self.refactor_version)
+            status = { "success": True}
             return flask.jsonify(**status)
         elif command == "install_refactor":
-            self.refactor.install_refactor()
+            filename = data["filename"]
+            self.refactor.install_version(filename)
             return flask.jsonify(**{"success": True})
         elif command == "cancel_download":
-            self.refactor.cancel_download()
-            status = {"success": True}
+            stat = self.refactor.cancel_download()
+            status = {"success": stat}
             return flask.jsonify(**status)
-        elif command == "get_install_progress":
+        elif command == "get_download_progress":
             progress = self.refactor.get_download_progress()
+            return flask.jsonify(**progress)
+        elif command == "get_install_progress":
+            progress = self.refactor.get_install_progress()
             return flask.jsonify(**progress)
 
     def on_api_get(self, request):

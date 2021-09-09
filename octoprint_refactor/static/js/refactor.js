@@ -9,42 +9,60 @@ $(function() {
         var self = this;
         self.settings = parameters[0];
         self.bootMedia = ko.observable();
-        self.versions = new ItemListHelper(
-            "plugin_refactor_versions", {}, {},
-            "name",
-            [],
-            [],
-            5
-        );
+        self.programVersions = ko.observable();
+        self.remoteRefactorVersions = ko.observable();
+        self.remoteSelectedVersion = ko.observable();
+        self.localRefactorVersions = ko.observable();
+        self.localSelectedVersion = ko.observable();
+        self.downloadProgress = ko.observable("0%");
+        self.isDownloading = ko.observable(false);
+        self.isInstalling = ko.observable(false);
+        self.installProgress = ko.observable("0%");
+        self.isInstallFinished = ko.observable(false);
 
-        self.availableRefactorVersions = ko.observable();
-        self.selectedVersion = ko.observable();
         self.onBeforeBinding = function() {
             self.requestData();
         }
-        self.installSelectedVersion = function() {
+        self.downloadSelectedVersion = function() {
             self.runCommand("download_refactor", {
-                "refactor_version": self.selectedVersion()
+                "refactor_version": self.remoteSelectedVersion()
             }, function(status) {
-                self.progressTimer = setInterval(self.checkProgress, 1000);
+                self.downloadProgressTimer = setInterval(self.checkDownloadProgress, 1000);
                 self.isDownloading(true);
             });
         }
         self.cancelDownload = function() {
           self.runCommand("cancel_download", {}, function(status) {
-              clearInterval(self.progressTimer);
+              clearInterval(self.downloadProgressTimer);
               self.isDownloading(false);
           });
         }
-        self.downloadProgress = ko.observable("0%");
-        self.isDownloading = ko.observable(false);
-        self.checkProgress = function() {
-            self.runCommand("get_install_progress", {}, function(data) {
+        self.checkDownloadProgress = function() {
+            self.runCommand("get_download_progress", {}, function(data) {
                 self.downloadProgress((data.progress*100).toString()+"%");
                 if(data.progress > 0.999){
-                  clearInterval(self.progressTimer);
+                  clearInterval(self.downloadProgressTimer);
                   self.isDownloading(false);
                 }
+            });
+        }
+        self.checkInstallProgress = function() {
+            self.runCommand("get_install_progress", {}, function(data) {
+                self.installProgress((data.progress).toString()+"%");
+                if(data.progress == 100){
+                  clearInterval(self.installProgressTimer);
+                  self.isInstalling(false);
+                  self.isInstallFinished(true);
+                }
+            });
+        }
+        self.installSelectedVersion = function() {
+            self.runCommand("install_refactor", {
+                "filename": self.localSelectedVersion()
+            }, function(status) {
+                self.installProgressTimer = setInterval(self.checkInstallProgress, 1000);
+                self.isInstalling(true);
+                self.isInstallFinished(false);
             });
         }
         self.changeBootMedia = function() {
@@ -52,23 +70,14 @@ $(function() {
                 self.bootMedia(data.boot_media);
             });
         }
-
         self.requestData = function() {
             self.runCommand("get_data", {}, function(data) {
-                var versions = [];
-                _.each(_.keys(data.versions), function(key) {
-                    versions.push({
-                        key: key,
-                        name: ko.observable(data.versions[key].name),
-                        version: ko.observable(data.versions[key].version)
-                    });
-                });
-                self.versions.updateItems(versions);
+                self.programVersions(data.versions);
                 self.bootMedia(data.boot_media);
-                self.availableRefactorVersions(data.releases);
+                self.remoteRefactorVersions(data.releases);
+                self.localRefactorVersions(data.locals);
             });
         }
-
         self.runCommand = function(command, params, on_success) {
             $.ajax({
                 url: API_BASEURL + "plugin/refactor",

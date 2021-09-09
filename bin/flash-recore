@@ -1,0 +1,5 @@
+#!/bin/bash
+
+INFILE=$1
+OUTFILE=$2
+xz -v -d -c ${INFILE} | dd of=${OUTFILE}
