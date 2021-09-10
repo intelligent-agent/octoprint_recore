@@ -103,7 +103,7 @@ class Refactor:
             self.install_error = "Chosen file is not present"
             print(self.install_error)
             return
-        cmd = ["./bin/flash-recore", infile, self.emmc_dev]
+        cmd = ["/sbin/flash-recore", infile, self.emmc_dev]
         self.bytes_total = self.get_uncompressed_size(infile)
         self.bytes_transferred = 0
         self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
