@@ -7,11 +7,15 @@ USB_BOOT_ARGS_FILE = "/mnt/usb/"+BOOT_ARGS_FILE
 
 import os.path
 import concurrent.futures
+import subprocess
+import time
 
 class Refactor:
     def __init__(self, settings):
         self.refactor_version_file = settings.get(["version_file"])
         self.klipper_dir = settings.get(["klipper_dir"])
+        self.emmc_dev = settings.get(["emmc_dev"])
+        self.images_folder = settings.get(["images_folder"])
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
         self.bytes_downloaded = 0
         self.bytes_to_download = 1
@@ -41,7 +45,7 @@ class Refactor:
 
     def get_local_releases(self):
         import glob
-        images = [os.path.basename(f) for f in glob.glob("images/*.img.xz")]
+        images = [os.path.basename(f) for f in glob.glob(self.images_folder+"/*.img.xz")]
         return images
 
     def download_version(self, refactor_version):
@@ -59,7 +63,7 @@ class Refactor:
         # Answer by Dennis Patterson
         # https://stackoverflow.com/questions/53101597/how-to-download-binary-file-using-requests
         #
-        local_filename = "images/"+filename
+        local_filename = self.images_folder+"/"+filename
         r = requests.get(url, stream=True)
         with open(local_filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=1024):
@@ -84,25 +88,41 @@ class Refactor:
         print(f"installing {filename}")
         self.install_progress = 0
         self.is_install_finished = False
+        self.bytes_transferred = 0
         self.executor.submit(self.install_refactor, filename)
 
+    def get_uncompressed_size(self, infile):
+        line = subprocess.run(f"xz -l {infile} | grep MiB", shell=True, capture_output=True, text=True).stdout
+        size = float(line.split()[4].replace(",", ""))*1000*1000
+        return size
+
     def install_refactor(self, filename):
-        infile = "./images/"+filename
+        infile = self.images_folder+"/"+filename
+        print(infile)
         if not os.path.isfile(infile):
             self.install_error = "Chosen file is not present"
+            print(self.install_error)
             return
-        outfile = "./images/test.img.xz"
-        cmd = f"./bin/flash-recore {infile} '{outfile} bs=1c count=10000000'"
-        print(cmd)
-        #import subprocess
-        #print(subprocess.popen(cmd, stdout=PIPE).stdout.read())
-        self.install_progress = 100
+        cmd = ["./bin/flash-recore", infile, self.emmc_dev]
+        self.bytes_total = self.get_uncompressed_size(infile)
+        self.bytes_transferred = 0
+        self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        while True:
+            time.sleep(0.3)
+            if self.process.poll() == 0:
+                break
+            with open("/tmp/recore-flash-progress") as f:
+                lines = f.readlines()
+                if len(lines):
+                    self.bytes_transferred = int(lines[-1].strip())
+            self.install_progress = self.bytes_transferred/self.bytes_total
         self.is_install_finished = True
 
     def get_install_progress(self):
         return {
-            "progress": (self.install_progress),
-            "is_finished": self.is_install_finished
+            "progress": self.install_progress,
+            "is_finished": self.is_install_finished,
+            "error": self.install_error
         }
 
     def get_rootfs(self):

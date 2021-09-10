@@ -29,7 +29,9 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
         return {
             "version_file": "/etc/refactor.version",
             "klipper_dir": "/home/debian/klipper",
-            "install_script": "/root/install_refactor.sh"
+            "install_script": "/root/install_refactor.sh",
+            "emmc_dev": "/dev/mmcblk0",
+            "images_folder": "/home/debian/images/"
         }
 
     def get_template_configs(self):
