@@ -43,6 +43,7 @@ $(function() {
                 if(data.progress > 0.999){
                   clearInterval(self.downloadProgressTimer);
                   self.isDownloading(false);
+                  self.requestData();
                 }
             });
         }

@@ -49,7 +49,6 @@ class Refactor:
         return images
 
     def download_version(self, refactor_version):
-        print("Downloading version: "+refactor_version["name"])
         url = refactor_version["assets"][0]['browser_download_url']
         self.bytes_downloaded = 0
         self.download_cancelled = False
@@ -85,7 +84,6 @@ class Refactor:
         }
 
     def install_version(self, filename):
-        print(f"installing {filename}")
         self.install_progress = 0
         self.is_install_finished = False
         self.bytes_transferred = 0
@@ -98,12 +96,10 @@ class Refactor:
 
     def install_refactor(self, filename):
         infile = self.images_folder+"/"+filename
-        print(infile)
         if not os.path.isfile(infile):
             self.install_error = "Chosen file is not present"
-            print(self.install_error)
             return
-        cmd = ["/sbin/flash-recore", infile, self.emmc_dev]
+        cmd = ["sudo", "/sbin/flash-recore", infile, self.emmc_dev]
         self.bytes_total = self.get_uncompressed_size(infile)
         self.bytes_transferred = 0
         self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -125,7 +121,7 @@ class Refactor:
             "error": self.install_error
         }
 
-    def get_rootfs(self):
+    def get_rootfs():
         import re
         for line in open("/proc/mounts", 'r'):
             if re.search('/ ', line):
@@ -156,12 +152,12 @@ class Refactor:
         else:
             os.system("sudo /sbin/set-boot-media emmc")
 
-    def is_usb_present(self):
-        if self.get_rootfs() == "usb":
+    def is_usb_present():
+        if Refactor.get_rootfs() == "usb":
             return True
         return os.path.isfile(USB_BOOT_ARGS_FILE)
 
-    def is_emmc_present(self):
-        if self.get_rootfs() == "emmc":
+    def is_emmc_present():
+        if Refactor.get_rootfs() == "emmc":
             return True
         return os.path.isfile(EMMC_BOOT_ARGS_FILE)

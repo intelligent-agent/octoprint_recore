@@ -40,9 +40,9 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
 
     def get_template_vars(self):
         return {
-            "rootfs": self.refactor.get_rootfs(),
-            "usb_present": self.refactor.is_usb_present(),
-            "emmc_present": self.refactor.is_emmc_present()
+            "rootfs": Refactor.get_rootfs(),
+            "usb_present": Refactor.is_usb_present(),
+            "emmc_present": Refactor.is_emmc_present()
         }
 
     def get_assets(self):
