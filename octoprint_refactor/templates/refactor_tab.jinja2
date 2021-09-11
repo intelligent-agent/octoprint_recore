@@ -68,11 +68,14 @@ In this section, you can choose which drive to boot from.
 If you are running from a USB drive, you can download Refactor to the USB and
 have it ready for flashing.
 <div id="images">
-  <div class="boot-media">
+  <div class="flash-media">
     <b>GitHub</b><br>
     <img src="/plugin/refactor/static/img/GitHub.png" /><br>
   </div>
-  <div class="boot-media">
+  <div class="flash-media" style="width: 15%">
+    <img src="/plugin/refactor/static/img/arrow-left.png" />
+  </div>
+  <div class="flash-media">
     <b>USB drive</b><br>
     <img src="/plugin/refactor/static/img/USB.png" /><br>
   </div>
@@ -90,7 +93,7 @@ have it ready for flashing.
 </div>
 <div data-bind="if: isDownloading()">
   <div data-bind="style: { width: downloadProgress }" style="height: 20px; background-color: blue;"></div>
-  Downloading <span data-bind="text: remoteSelectedVersion().name"></span>
+  Downloading <span data-bind="text: remoteSelectedVersion().name"></span> Progress: <span data-bind="text: downloadProgress"></span>
   <button style="float: right;" class="btn btn-primary" data-bind="click: cancelDownload">Cancel</button>
 </div>
 

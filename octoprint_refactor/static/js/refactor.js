@@ -39,8 +39,8 @@ $(function() {
         }
         self.checkDownloadProgress = function() {
             self.runCommand("get_download_progress", {}, function(data) {
-                self.downloadProgress((data.progress*100).toString()+"%");
-                if(data.progress > 0.999){
+                self.downloadProgress((data.progress*100).toFixed(1).toString()+"%");
+                if(data.is_finished){
                   clearInterval(self.downloadProgressTimer);
                   self.isDownloading(false);
                   self.requestData();
@@ -50,10 +50,10 @@ $(function() {
         self.checkInstallProgress = function() {
             self.runCommand("get_install_progress", {}, function(data) {
                 self.installProgress((data.progress*100).toString()+"%");
-                if(data.progress >= 0.99){
+                if(data.is_finished){
                   clearInterval(self.installProgressTimer);
                   self.isInstalling(false);
-                  self.isInstallFinished(true);
+                  self.isInstallFinished(data.is_finished);
                 }
             });
         }

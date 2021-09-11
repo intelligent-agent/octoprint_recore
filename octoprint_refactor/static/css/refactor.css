@@ -6,6 +6,14 @@
     width: 49%;
 }
 
+
+.flash-media {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 33%;
+}
+
 #images{
     text-align:center;
 }
