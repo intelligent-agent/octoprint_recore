@@ -91,7 +91,7 @@ class Refactor:
 
     def get_uncompressed_size(self, infile):
         line = subprocess.run(f"xz -l {infile} | grep MiB", shell=True, capture_output=True, text=True).stdout
-        size = float(line.split()[4].replace(",", ""))*1000*1000
+        size = float(line.split()[4].replace(",", ""))*1024*1024
         return size
 
     def install_refactor(self, filename):
@@ -106,13 +106,16 @@ class Refactor:
         while True:
             time.sleep(0.3)
             if self.process.poll() == 0:
+                self.is_install_finished = True
                 break
             with open("/tmp/recore-flash-progress") as f:
                 lines = f.readlines()
                 if len(lines):
-                    self.bytes_transferred = int(lines[-1].strip())
+                    try:
+                        self.bytes_transferred = int(lines[-1].strip())
+                    except:
+                        pass
             self.install_progress = self.bytes_transferred/self.bytes_total
-        self.is_install_finished = True
 
     def get_install_progress(self):
         return {
