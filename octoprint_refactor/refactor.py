@@ -138,12 +138,20 @@ class Refactor:
 
     def get_boot_media(self):
         import re
-        for line in open(EMMC_BOOT_ARGS_FILE, 'r'):
+
+        if Refactor.is_emmc_present():
+            boot_args_file = EMMC_BOOT_ARGS_FILE
+        elif Refactor.is_usb_present():
+            boot_args_file = USB_BOOT_ARGS_FILE
+        else:
+            return "unknown"
+        for line in open(boot_args_file, 'r'):
             if re.search('extraargs', line):
                 if BOOTDEVICE_USB in line:
                     return "usb"
                 elif BOOTDEVICE_EMMC in line:
                     return "emmc"
+        # If no device is specified, it is eMMC
         return "emmc"
 
     def change_boot_media(self):
