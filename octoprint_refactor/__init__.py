@@ -80,7 +80,10 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
                 ],
                 "boot_media": self.refactor.get_boot_media(),
                 "releases": self.refactor.get_releases(),
-                "locals": self.refactor.get_local_releases()
+                "locals": self.refactor.get_local_releases(),
+                "rootfs": Refactor.get_rootfs(),
+                "usb_present": Refactor.is_usb_present(),
+                "emmc_present": Refactor.is_emmc_present()
             }
             return flask.jsonify(**data)
         elif command == "change_boot_media":

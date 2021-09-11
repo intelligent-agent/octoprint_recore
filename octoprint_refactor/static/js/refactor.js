@@ -9,6 +9,7 @@ $(function() {
         var self = this;
         self.settings = parameters[0];
         self.bootMedia = ko.observable();
+        self.rootfs = ko.observable();
         self.programVersions = ko.observable();
         self.remoteRefactorVersions = ko.observable();
         self.remoteSelectedVersion = ko.observable();
@@ -19,6 +20,8 @@ $(function() {
         self.isInstalling = ko.observable(false);
         self.installProgress = ko.observable("0%");
         self.isInstallFinished = ko.observable(false);
+        self.isEmmcPresent = ko.observable(false);
+        self.isUsbPresent = ko.observable(false);
 
         self.onBeforeBinding = function() {
             self.requestData();
@@ -53,7 +56,8 @@ $(function() {
                 if(data.is_finished){
                   clearInterval(self.installProgressTimer);
                   self.isInstalling(false);
-                  self.isInstallFinished(data.is_finished);
+                  self.isInstallFinished(true);
+                  self.requestData();
                 }
             });
         }
@@ -77,6 +81,9 @@ $(function() {
                 self.bootMedia(data.boot_media);
                 self.remoteRefactorVersions(data.releases);
                 self.localRefactorVersions(data.locals);
+                self.isEmmcPresent(data.emmc_present);
+                self.isUsbPresent(data.usb_present);
+                self.rootfs(data.rootfs);
             });
         }
         self.runCommand = function(command, params, on_success) {

@@ -25,40 +25,37 @@ In this section, you can choose which drive to boot from.
   <div class="boot-media">
     <b>eMMC</b><br>
     <img src="/plugin/refactor/static/img/eMMC.png" /><br>
-    <b>
-    {% if plugin_refactor_rootfs == "emmc" %}
-      Currently running from eMMC
-    {% else %}
-      Present
-    {% endif %}
-    </b><br>
-
-    <div data-bind="if: bootMedia() == 'emmc'">
-      <b>After a reboot will run from eMMC</b>
-    </div>
-    <div data-bind="ifnot: bootMedia() == 'emmc'">
-      <button class="btn btn-primary" data-bind="click: changeBootMedia">Run from eMMC</button>
+    <div style="height: 70px">
+      <div data-bind="text: isEmmcPresent() ? 'Present' : 'Not found'"></div>
+      <div data-bind="if: rootfs() == 'emmc'">
+        <b>Currently running from eMMC</b>
+      </div>
+      <div data-bind="if: bootMedia() == 'emmc'">
+        <b>After a reboot will run from eMMC</b>
+      </div>
+      <div data-bind="if: isEmmcPresent">
+        <div data-bind="ifnot: bootMedia() == 'emmc'">
+          <button class="btn btn-primary" data-bind="click: changeBootMedia">Run from eMMC</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="boot-media">
     <b>USB drive</b><br>
     <img src="/plugin/refactor/static/img/USB.png" /><br>
-    <b>
-    {% if plugin_refactor_rootfs == "usb" %}
-      Currently running from USB drive
-    {% else %}
-      {% if plugin_refactor_usb_present  %}
-        Present
-      {% else %}
-        Not present
-      {% endif %}
-    {% endif %}
-    </b><br>
-    <div data-bind="if: bootMedia() == 'usb'">
-      <b>After a reboot will run from USB drive</b>
-    </div>
-    <div data-bind="ifnot: bootMedia() == 'usb'">
-      <button class="btn btn-primary" data-bind="click: changeBootMedia">Run from USB drive</button>
+    <div style="height: 70px">
+      <div data-bind="text: isUsbPresent() ? 'Present' : 'Not found'"></div>
+      <div data-bind="if: rootfs() == 'usb'">
+        <b>Currently running from  USB drive</b>
+      </div>
+      <div data-bind="if: bootMedia() == 'usb'">
+        <b>After a reboot will run from USB drive</b>
+      </div>
+      <div data-bind="if: isUsbPresent">
+        <div data-bind="ifnot: bootMedia() == 'usb'">
+          <button class="btn btn-primary" data-bind="click: changeBootMedia">Run from USB drive</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

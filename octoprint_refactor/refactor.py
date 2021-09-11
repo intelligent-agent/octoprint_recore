@@ -87,11 +87,16 @@ class Refactor:
         self.install_progress = 0
         self.is_install_finished = False
         self.bytes_transferred = 0
-        self.executor.submit(self.install_refactor, filename)
+        ex = self.executor.submit(self.install_refactor, filename)
+        #ex.result()
 
     def get_uncompressed_size(self, infile):
         line = subprocess.run(f"xz -l {infile} | grep MiB", shell=True, capture_output=True, text=True).stdout
-        size = float(line.split()[4].replace(",", ""))*1024*1024
+        try:
+            size = float(line.split()[4].replace(",", ""))*1024*1024
+        except:
+            self.install_error = "Unable to get uncompressed file size"
+            size = 1
         return size
 
     def install_refactor(self, filename):
@@ -133,7 +138,7 @@ class Refactor:
                 elif "sd" in line:
                     return "usb"
                 elif "nvme" in line:
-                    return "usb"
+                    return "emmc"
                 else:
                     return line
                 if line == None:
