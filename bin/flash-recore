@@ -5,4 +5,5 @@ OUTFILE=$2
 umount ${OUTFILE} || /bin/true
 (xz -d -c ${INFILE} | pv -f -n -b | dd of=${OUTFILE}) 2>/tmp/recore-flash-progress
 sync
+blockdev --flushbufs ${OUTFILE}
 mount -a
