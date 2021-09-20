@@ -1,7 +1,7 @@
 
-BOOTDEVICE_USB  = "extraargs=root=/dev/sda1"
-BOOTDEVICE_EMMC = "extraargs=root=/dev/mmcblk0p1"
-BOOT_ARGS_FILE = "/boot/armbianEnv.txt"
+BOOTDEVICE_USB  = "rootdev=/dev/sda"
+BOOTDEVICE_EMMC = "rootdev=/dev/mmcblk0"
+BOOT_ARGS_FILE = "/armbianEnv.txt"
 EMMC_BOOT_ARGS_FILE = "/mnt/emmc/"+BOOT_ARGS_FILE
 USB_BOOT_ARGS_FILE = "/mnt/usb/"+BOOT_ARGS_FILE
 
@@ -154,7 +154,7 @@ class Refactor:
         else:
             return "unknown"
         for line in open(boot_args_file, 'r'):
-            if re.search('extraargs', line):
+            if re.search('rootdev=', line):
                 if BOOTDEVICE_USB in line:
                     return "usb"
                 elif BOOTDEVICE_EMMC in line:
