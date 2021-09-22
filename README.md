@@ -17,6 +17,7 @@ are on earlier Refactor versions must run a "bootstrap" script in order to get s
 This requires access to the command line using ssh.
 
 From the commandline:
+
     wget https://raw.githubusercontent.com/intelligent-agent/octoprint_refactor/main/bins/migrate-from-v301-to-v302-set-rootdev.sh
     bash migrate-from-v301-to-v302-set-rootdev.sh
 
