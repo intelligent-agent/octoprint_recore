@@ -30,7 +30,6 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
             "version_file": "/etc/refactor.version",
             "klipper_dir": "/home/debian/klipper",
             "install_script": "/root/install_refactor.sh",
-            "emmc_dev": "/dev/mmcblk0",
             "images_folder": "/home/debian/images/"
         }
 

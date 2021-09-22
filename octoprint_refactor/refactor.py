@@ -1,14 +1,14 @@
-
-BOOTDEVICE_USB  = "rootdev=/dev/sda"
+BOOTDEVICE_USB = "rootdev=/dev/sda"
 BOOTDEVICE_EMMC = "rootdev=/dev/mmcblk0"
 BOOT_ARGS_FILE = "/armbianEnv.txt"
-EMMC_BOOT_ARGS_FILE = "/mnt/emmc/"+BOOT_ARGS_FILE
-USB_BOOT_ARGS_FILE = "/mnt/usb/"+BOOT_ARGS_FILE
+EMMC_BOOT_ARGS_FILE = "/mnt/emmc/" + BOOT_ARGS_FILE
+USB_BOOT_ARGS_FILE = "/mnt/usb/" + BOOT_ARGS_FILE
 
 import os.path
 import concurrent.futures
 import subprocess
 import time
+
 
 class Refactor:
     def __init__(self, settings):
@@ -32,7 +32,7 @@ class Refactor:
 
     def get_klipper_version(self):
         import subprocess
-        path = "git -C "+self.klipper_dir+" describe --always --tags --long --dirty"
+        path = "git -C " + self.klipper_dir + " describe --always --tags --long --dirty"
         try:
             return subprocess.check_output(path.split()).strip()
         except subprocess.CalledProcessError:
@@ -40,12 +40,16 @@ class Refactor:
 
     def get_releases(self):
         import requests
-        self.releases = requests.get("https://api.github.com/repos/intelligent-agent/Refactor/releases")
+        self.releases = requests.get(
+            "https://api.github.com/repos/intelligent-agent/Refactor/releases")
         return self.releases.json()
 
     def get_local_releases(self):
         import glob
-        images = [os.path.basename(f) for f in glob.glob(self.images_folder+"/*.img.xz")]
+        images = [
+            os.path.basename(f)
+            for f in glob.glob(self.images_folder + "/*.img.xz")
+        ]
         return images
 
     def download_version(self, refactor_version):
@@ -54,7 +58,7 @@ class Refactor:
         self.download_cancelled = False
         self.is_download_finished = False
         self.bytes_to_download = refactor_version["assets"][0]['size']
-        filename = "Refactor-recore-"+refactor_version["name"]+".img.xz"
+        filename = "Refactor-recore-" + refactor_version["name"] + ".img.xz"
         self.executor.submit(self.download_refactor, url, filename)
 
     def download_refactor(self, url, filename):
@@ -62,7 +66,7 @@ class Refactor:
         # Answer by Dennis Patterson
         # https://stackoverflow.com/questions/53101597/how-to-download-binary-file-using-requests
         #
-        local_filename = self.images_folder+"/"+filename
+        local_filename = self.images_folder + "/" + filename
         r = requests.get(url, stream=True)
         with open(local_filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=1024):
@@ -78,7 +82,7 @@ class Refactor:
 
     def get_download_progress(self):
         return {
-            "progress": (self.bytes_downloaded/self.bytes_to_download),
+            "progress": (self.bytes_downloaded / self.bytes_to_download),
             "cancelled": self.download_cancelled,
             "is_finished": self.is_download_finished
         }
@@ -88,19 +92,21 @@ class Refactor:
         self.is_install_finished = False
         self.bytes_transferred = 0
         ex = self.executor.submit(self.install_refactor, filename)
-        #ex.result()
 
     def get_uncompressed_size(self, infile):
-        line = subprocess.run(f"xz -l {infile} | grep MiB", shell=True, capture_output=True, text=True).stdout
+        line = subprocess.run(f"xz -l {infile} | grep MiB",
+                              shell=True,
+                              capture_output=True,
+                              text=True).stdout
         try:
-            size = float(line.split()[4].replace(",", ""))*1024*1024
+            size = float(line.split()[4].replace(",", "")) * 1024 * 1024
         except:
             self.install_error = "Unable to get uncompressed file size"
             size = 1
         return size
 
     def install_refactor(self, filename):
-        infile = self.images_folder+"/"+filename
+        infile = self.images_folder + "/" + filename
         if not os.path.isfile(infile):
             self.install_error = "Chosen file is not present"
             return
@@ -120,7 +126,7 @@ class Refactor:
                         self.bytes_transferred = int(lines[-1].strip())
                     except:
                         pass
-            self.install_progress = self.bytes_transferred/self.bytes_total
+            self.install_progress = self.bytes_transferred / self.bytes_total
 
     def get_install_progress(self):
         return {
@@ -145,22 +151,9 @@ class Refactor:
                     return 'Unknown'
 
     def get_boot_media(self):
-        import re
-
-        if Refactor.is_emmc_present():
-            boot_args_file = EMMC_BOOT_ARGS_FILE
-        elif Refactor.is_usb_present():
-            boot_args_file = USB_BOOT_ARGS_FILE
-        else:
-            return "unknown"
-        for line in open(boot_args_file, 'r'):
-            if re.search('rootdev=', line):
-                if BOOTDEVICE_USB in line:
-                    return "usb"
-                elif BOOTDEVICE_EMMC in line:
-                    return "emmc"
-        # If no device is specified, it is eMMC
-        return "emmc"
+        return subprocess.run(["/sbin/get-boot-media"],
+                              capture_output=True,
+                              text=True).stdout.strip()
 
     def change_boot_media(self):
         if self.get_boot_media() == "emmc":
@@ -169,11 +162,11 @@ class Refactor:
             os.system("sudo /sbin/set-boot-media emmc")
 
     def is_usb_present():
-        if Refactor.get_rootfs() == "usb":
-            return True
-        return os.path.isfile(USB_BOOT_ARGS_FILE)
+        return subprocess.run(["/sbin/is-media-present", "usb"],
+                              capture_output=True,
+                              text=True).stdout.strip() == "yes"
 
     def is_emmc_present():
-        if Refactor.get_rootfs() == "emmc":
-            return True
-        return os.path.isfile(EMMC_BOOT_ARGS_FILE)
+        return subprocess.run(["/sbin/is-media-present", "emmc"],
+                              capture_output=True,
+                              text=True).stdout.strip() == "yes"
