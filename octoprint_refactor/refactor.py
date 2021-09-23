@@ -1,9 +1,3 @@
-BOOTDEVICE_USB = "rootdev=/dev/sda"
-BOOTDEVICE_EMMC = "rootdev=/dev/mmcblk0"
-BOOT_ARGS_FILE = "/armbianEnv.txt"
-EMMC_BOOT_ARGS_FILE = "/mnt/emmc/" + BOOT_ARGS_FILE
-USB_BOOT_ARGS_FILE = "/mnt/usb/" + BOOT_ARGS_FILE
-
 import os.path
 import concurrent.futures
 import subprocess
@@ -14,7 +8,6 @@ class Refactor:
     def __init__(self, settings):
         self.refactor_version_file = settings.get(["version_file"])
         self.klipper_dir = settings.get(["klipper_dir"])
-        self.emmc_dev = settings.get(["emmc_dev"])
         self.images_folder = settings.get(["images_folder"])
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
         self.bytes_downloaded = 0
@@ -110,7 +103,7 @@ class Refactor:
         if not os.path.isfile(infile):
             self.install_error = "Chosen file is not present"
             return
-        cmd = ["sudo", "/sbin/flash-recore", infile, self.emmc_dev]
+        cmd = ["sudo", "/sbin/flash-recore", infile]
         self.bytes_total = self.get_uncompressed_size(infile)
         self.bytes_transferred = 0
         self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
