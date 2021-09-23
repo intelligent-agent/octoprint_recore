@@ -137,7 +137,7 @@ class Refactor:
         return Refactor.run_system_command("/sbin/get-rootfs")
 
     def get_boot_media(self):
-        return Refactor.run_system_command("/sbin/get-boot-media")
+        return Refactor.run_system_command("sudo /sbin/get-boot-media")
 
     def change_boot_media(self):
         if self.get_boot_media() == "emmc":
