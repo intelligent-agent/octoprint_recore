@@ -1,0 +1,6 @@
+#!/bin/bash
+
+INFILE=$1
+
+(xz -d -c $INFILE | pv -f -n -b | dd of=/dev/null) 2>/tmp/recore-flash-progress
+sync

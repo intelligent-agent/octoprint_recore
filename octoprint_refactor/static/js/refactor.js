@@ -52,7 +52,7 @@ $(function() {
         }
         self.checkInstallProgress = function() {
             self.runCommand("get_install_progress", {}, function(data) {
-                self.installProgress((data.progress*100).toString()+"%");
+                self.installProgress((data.progress*100).toFixed(1).toString()+"%");
                 if(data.is_finished){
                   clearInterval(self.installProgressTimer);
                   self.isInstalling(false);

@@ -128,25 +128,16 @@ class Refactor:
             "error": self.install_error
         }
 
-    def get_rootfs():
-        import re
-        for line in open("/proc/mounts", 'r'):
-            if re.search('/ ', line):
-                if "mmcblk" in line:
-                    return "emmc"
-                elif "sd" in line:
-                    return "usb"
-                elif "nvme" in line:
-                    return "emmc"
-                else:
-                    return line
-                if line == None:
-                    return 'Unknown'
-
-    def get_boot_media(self):
-        return subprocess.run(["/sbin/get-boot-media"],
+    def run_system_command(command):
+        return subprocess.run(command.split(),
                               capture_output=True,
                               text=True).stdout.strip()
+
+    def get_rootfs():
+        return Refactor.run_system_command("/sbin/get-rootfs")
+
+    def get_boot_media(self):
+        return Refactor.run_system_command("/sbin/get-boot-media")
 
     def change_boot_media(self):
         if self.get_boot_media() == "emmc":
@@ -155,11 +146,7 @@ class Refactor:
             os.system("sudo /sbin/set-boot-media emmc")
 
     def is_usb_present():
-        return subprocess.run(["/sbin/is-media-present", "usb"],
-                              capture_output=True,
-                              text=True).stdout.strip() == "yes"
+        return Refactor.run_system_command("/sbin/is-media-present usb") == "yes"
 
     def is_emmc_present():
-        return subprocess.run(["/sbin/is-media-present", "emmc"],
-                              capture_output=True,
-                              text=True).stdout.strip() == "yes"
+        return Refactor.run_system_command("/sbin/is-media-present emmc") == "yes"

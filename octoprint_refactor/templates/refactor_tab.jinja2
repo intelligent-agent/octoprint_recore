@@ -60,57 +60,55 @@ In this section, you can choose which drive to boot from.
   </div>
 </div>
 
-
-<h4>{{ _('Download Refactor') }}</h4>
-If you are running from a USB drive, you can download Refactor to the USB and
-have it ready for flashing.
-<div id="images">
-  <div class="flash-media">
-    <b>GitHub</b><br>
-    <img src="/plugin/refactor/static/img/GitHub.png" /><br>
+<div data-bind="if: rootfs() == 'usb'">
+  <h4>{{ _('Download Refactor') }}</h4>
+  If you are running from a USB drive, you can download Refactor to the USB and
+  have it ready for flashing.
+  <div id="images">
+    <div class="flash-media">
+      <b>GitHub</b><br>
+      <img src="/plugin/refactor/static/img/GitHub.png" /><br>
+    </div>
+    <div class="flash-media" style="width: 15%">
+      <img src="/plugin/refactor/static/img/arrow-left.png" />
+    </div>
+    <div class="flash-media">
+      <b>USB drive</b><br>
+      <img src="/plugin/refactor/static/img/USB.png" /><br>
+    </div>
   </div>
-  <div class="flash-media" style="width: 15%">
-    <img src="/plugin/refactor/static/img/arrow-left.png" />
+  <h5>Checklist</h5>
+  <div> (✓) You have at least 1.5 GB of space</div>
+  <div data-bind="ifnot: isDownloading()">
+    <label><b>Choose Refactor version to download</b></label>
+    <select data-bind="options: remoteRefactorVersions, optionsText: function(item) {
+                           return item.name
+                       },
+                        value: remoteSelectedVersion"></select>
+    <button class="btn btn-primary" data-bind="click: downloadSelectedVersion">Download</button>
   </div>
-  <div class="flash-media">
-    <b>USB drive</b><br>
-    <img src="/plugin/refactor/static/img/USB.png" /><br>
+  <div data-bind="if: isDownloading()">
+    <div data-bind="style: { width: downloadProgress }" style="height: 20px; background-color: blue;"></div>
+    Downloading <span data-bind="text: remoteSelectedVersion().name"></span> Progress: <span data-bind="text: downloadProgress"></span>
+    <button style="float: right;" class="btn btn-primary" data-bind="click: cancelDownload">Cancel</button>
   </div>
-</div>
-<h5>Checklist</h5>
-<div> (✓) You are Running from a USB drive</div>
-<div> (✓) You have at least 1.5 GB of space</div>
-<div data-bind="ifnot: isDownloading()">
-  <label><b>Choose Refactor version to download</b></label>
-  <select data-bind="options: remoteRefactorVersions, optionsText: function(item) {
-                         return item.name
-                     },
-                      value: remoteSelectedVersion"></select>
-  <button class="btn btn-primary" data-bind="click: downloadSelectedVersion">Download</button>
-</div>
-<div data-bind="if: isDownloading()">
-  <div data-bind="style: { width: downloadProgress }" style="height: 20px; background-color: blue;"></div>
-  Downloading <span data-bind="text: remoteSelectedVersion().name"></span> Progress: <span data-bind="text: downloadProgress"></span>
-  <button style="float: right;" class="btn btn-primary" data-bind="click: cancelDownload">Cancel</button>
-</div>
 
 
-<h4>{{ _('Flash Refactor') }}</h4>
-If you are running from USB you can flash Refactor to the eMMC on Recore.
-This will overwrite all config files on the eMMC, so make sure you save a copy
-of the Klipper config file on your local computer.
-<h5>Checklist</h5>
-<div> (✓) You are Running from a USB drive</div>
-<div data-bind="ifnot: isInstalling()">
-  <label><b>Choose Refactor image to install</b></label>
-  <select data-bind="options: localRefactorVersions,
-                      value: localSelectedVersion,"></select>
-  <button class="btn btn-primary" data-bind="click: installSelectedVersion">Install</button>
+  <h4>{{ _('Flash Refactor') }}</h4>
+  If you are running from USB you can flash Refactor to the eMMC on Recore.
+  This will overwrite all config files on the eMMC, so make sure you save a copy
+  of the Klipper config file on your local computer.
+  <div data-bind="ifnot: isInstalling()">
+    <label><b>Choose Refactor image to install</b></label>
+    <select data-bind="options: localRefactorVersions,
+                        value: localSelectedVersion,"></select>
+    <button class="btn btn-primary" data-bind="click: installSelectedVersion">Install</button>
+  </div>
+  <div data-bind="if: isInstalling()">
+    <div data-bind="style: { width: installProgress }" style="height: 20px; background-color: blue;"></div>
+    Installing <span data-bind="text: localSelectedVersion()"></span>  Progress: <span data-bind="text: installProgress"></span>
+  </div>
+  <h5 data-bind="if: isInstallFinished()">
+    Install finished! New reboot the board using the system command
+  </h5>
 </div>
-<div data-bind="if: isInstalling()">
-  <div data-bind="style: { width: installProgress }" style="height: 20px; background-color: blue;"></div>
-  Installing <span data-bind="text: localSelectedVersion()"></span>
-</div>
-<h5 data-bind="if: isInstallFinished()">
-  Install finished! New reboot the board using the system command
-</h5>
