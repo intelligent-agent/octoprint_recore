@@ -18,6 +18,7 @@ echo "Found USB drive with Refactor version: ${NEW_VERSION}"
 echo
 
 sync
+umount /dev/sda1
 umount /dev/sda2
 
 echo "Running fsck"
