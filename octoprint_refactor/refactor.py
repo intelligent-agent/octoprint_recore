@@ -103,7 +103,7 @@ class Refactor:
         if not os.path.isfile(infile):
             self.install_error = "Chosen file is not present"
             return
-        cmd = ["sudo", "/sbin/flash-recore", infile]
+        cmd = ["sudo", "/usr/local/bin/flash-recore", infile]
         self.bytes_total = self.get_uncompressed_size(infile)
         self.bytes_transferred = 0
         self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -134,19 +134,19 @@ class Refactor:
                               text=True).stdout.strip()
 
     def get_rootfs():
-        return Refactor.run_system_command("/sbin/get-rootfs")
+        return Refactor.run_system_command("/usr/local/bin/get-rootfs")
 
     def get_boot_media(self):
-        return Refactor.run_system_command("sudo /sbin/get-boot-media")
+        return Refactor.run_system_command("sudo /usr/local/bin/get-boot-media")
 
     def change_boot_media(self):
         if self.get_boot_media() == "emmc":
-            os.system("sudo /sbin/set-boot-media usb")
+            os.system("sudo /usr/local/bin/set-boot-media usb")
         else:
-            os.system("sudo /sbin/set-boot-media emmc")
+            os.system("sudo /usr/local/bin/set-boot-media emmc")
 
     def is_usb_present():
-        return Refactor.run_system_command("/sbin/is-media-present usb") == "yes"
+        return Refactor.run_system_command("/usr/local/bin/is-media-present usb") == "yes"
 
     def is_emmc_present():
-        return Refactor.run_system_command("/sbin/is-media-present emmc") == "yes"
+        return Refactor.run_system_command("/usr/local/bin/is-media-present emmc") == "yes"
