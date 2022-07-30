@@ -1,8 +1,0 @@
-#!/bin/bash
-
-mkdir -p /tmp/refactor
-if [ ! -f /tmp/refactor/boot-media ]; then
-	echo "emmc" > /tmp/refactor/boot-media
-fi
-
-cat /tmp/refactor/boot-media

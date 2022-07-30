@@ -1,8 +1,0 @@
-#!/bin/bash
-
-mkdir -p /tmp/refactor/
-if [ ! -f /tmp/refactor/rootfs ]; then
-	echo "emmc" > /tmp/refactor/rootfs
-fi
-cat /tmp/refactor/rootfs
-

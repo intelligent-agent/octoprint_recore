@@ -22,68 +22,34 @@ $(function() {
         self.isInstallFinished = ko.observable(false);
         self.isEmmcPresent = ko.observable(false);
         self.isUsbPresent = ko.observable(false);
+        self.isSshEnabled = ko.observable(false);
 
         self.onBeforeBinding = function() {
             self.requestData();
-        }
-        self.downloadSelectedVersion = function() {
-            self.runCommand("download_refactor", {
-                "refactor_version": self.remoteSelectedVersion()
-            }, function(status) {
-                self.downloadProgressTimer = setInterval(self.checkDownloadProgress, 1000);
-                self.isDownloading(true);
-            });
-        }
-        self.cancelDownload = function() {
-          self.runCommand("cancel_download", {}, function(status) {
-              clearInterval(self.downloadProgressTimer);
-              self.isDownloading(false);
-          });
-        }
-        self.checkDownloadProgress = function() {
-            self.runCommand("get_download_progress", {}, function(data) {
-                self.downloadProgress((data.progress*100).toFixed(1).toString()+"%");
-                if(data.is_finished){
-                  clearInterval(self.downloadProgressTimer);
-                  self.isDownloading(false);
-                  self.requestData();
-                }
-            });
-        }
-        self.checkInstallProgress = function() {
-            self.runCommand("get_install_progress", {}, function(data) {
-                self.installProgress((data.progress*100).toFixed(1).toString()+"%");
-                if(data.is_finished){
-                  clearInterval(self.installProgressTimer);
-                  self.isInstalling(false);
-                  self.isInstallFinished(true);
-                  self.requestData();
-                }
-            });
-        }
-        self.installSelectedVersion = function() {
-            self.runCommand("install_refactor", {
-                "filename": self.localSelectedVersion()
-            }, function(status) {
-                self.installProgressTimer = setInterval(self.checkInstallProgress, 1000);
-                self.isInstalling(true);
-                self.isInstallFinished(false);
-            });
         }
         self.changeBootMedia = function() {
             self.runCommand("change_boot_media", {}, function(data) {
                 self.bootMedia(data.boot_media);
             });
         }
+        self.disableSsh = function() {
+            self.runCommand("set_ssh_enabled", {"is_enabled": false}, function(data) {
+                self.isSshEnabled(data.ssh_enabled);
+            });
+        }
+        self.enableSsh = function() {
+            self.runCommand("set_ssh_enabled", {"is_enabled": true}, function(data) {
+                self.isSshEnabled(data.ssh_enabled);
+            });
+        }
         self.requestData = function() {
             self.runCommand("get_data", {}, function(data) {
                 self.programVersions(data.versions);
                 self.bootMedia(data.boot_media);
-                self.remoteRefactorVersions(data.releases);
-                self.localRefactorVersions(data.locals);
                 self.isEmmcPresent(data.emmc_present);
                 self.isUsbPresent(data.usb_present);
                 self.rootfs(data.rootfs);
+                self.isSshEnabled(data.ssh_enabled);
             });
         }
         self.runCommand = function(command, params, on_success) {

@@ -28,9 +28,7 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
     def get_settings_defaults(self):
         return {
             "version_file": "/etc/refactor.version",
-            "klipper_dir": "/home/debian/klipper",
-            "install_script": "/root/install_refactor.sh",
-            "images_folder": "/home/debian/images/"
+            "klipper_dir": "/home/debian/klipper"
         }
 
     def get_template_configs(self):
@@ -57,11 +55,7 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
         return dict(
             get_data=[],
             change_boot_media=[],
-            download_refactor=["refactor_version"],
-            install_refactor=["filename"],
-            cancel_download=[],
-            get_download_progress=[],
-            get_install_progress=[]
+            set_ssh_enabled=["is_enabled"]
         )
 
     def on_api_command(self, command, data):
@@ -78,11 +72,10 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
                     }
                 ],
                 "boot_media": self.refactor.get_boot_media(),
-                "releases": self.refactor.get_releases(),
-                "locals": self.refactor.get_local_releases(),
                 "rootfs": Refactor.get_rootfs(),
                 "usb_present": Refactor.is_usb_present(),
-                "emmc_present": Refactor.is_emmc_present()
+                "emmc_present": Refactor.is_emmc_present(),
+                "ssh_enabled": Refactor.is_ssh_enabled()
             }
             return flask.jsonify(**data)
         elif command == "change_boot_media":
@@ -91,25 +84,13 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
                 "boot_media": self.refactor.get_boot_media()
             }
             return flask.jsonify(**status)
-        elif command == "download_refactor":
-            self.refactor_version = data["refactor_version"]
-            self.refactor.download_version(self.refactor_version)
-            status = { "success": True}
-            return flask.jsonify(**status)
-        elif command == "install_refactor":
-            filename = data["filename"]
-            self.refactor.install_version(filename)
-            return flask.jsonify(**{"success": True})
-        elif command == "cancel_download":
-            stat = self.refactor.cancel_download()
-            status = {"success": stat}
-            return flask.jsonify(**status)
-        elif command == "get_download_progress":
-            progress = self.refactor.get_download_progress()
-            return flask.jsonify(**progress)
-        elif command == "get_install_progress":
-            progress = self.refactor.get_install_progress()
-            return flask.jsonify(**progress)
+        elif command == "set_ssh_enabled":
+            is_enabled = data["is_enabled"]
+            self.refactor.set_ssh_enabled(is_enabled)
+            status = {
+                "ssh_enabled": Refactor.is_ssh_enabled()
+            }
+            return status
 
     def on_api_get(self, request):
         return flask.jsonify(foo="bar")
