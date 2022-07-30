@@ -1,4 +1,0 @@
-#!/bin/bash
-
-mkdir -p /tmp/refactor
-echo "$1" > /tmp/refactor/boot-media
