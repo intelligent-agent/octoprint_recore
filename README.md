@@ -1,7 +1,7 @@
 # OctoPrint-Refactor
 
-This plugin has been custom made to work with Refactor distribution and allows
-users to install updated versions of the software.
+This plugin has been custom made to work with Refactor/Rebuild distro and allows
+users to enable ssh.
 
 ## Setup
 
@@ -10,7 +10,7 @@ or manually using this URL:
 
     https://github.com/intelligent-agent/octoprint_refactor/archive/main.zip
 
-The plugin should come preinstalled with Refactor v3.0.2 and later.
+The plugin should come preinstalled with Refactor v3.0.2/Rebuild v1.0.1 and later.
 
 Because there are some settings that need root access to start, users that
 are on earlier Refactor versions must run a "bootstrap" script in order to get set up.

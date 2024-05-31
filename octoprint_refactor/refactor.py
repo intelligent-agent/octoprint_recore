@@ -27,27 +27,9 @@ class Refactor:
                               capture_output=True,
                               text=True).stdout.strip()
 
-    def get_rootfs():
-        return Refactor.run_system_command("/usr/local/bin/get-rootfs")
-
-    def get_boot_media(self):
-        return Refactor.run_system_command("sudo /usr/local/bin/get-boot-media")
-
-    def change_boot_media(self):
-        if self.get_boot_media() == "emmc":
-            os.system("sudo /usr/local/bin/set-boot-media usb")
-        else:
-            os.system("sudo /usr/local/bin/set-boot-media emmc")
-
     def set_ssh_enabled(self, enabled):
         is_enabled = "true" if enabled else "false"
         os.system(f"sudo /usr/local/bin/set-ssh-access {is_enabled}")
 
-    def is_usb_present():
-        return Refactor.run_system_command("/usr/local/bin/is-media-present usb") == "yes"
-
-    def is_emmc_present():
-        return Refactor.run_system_command("/usr/local/bin/is-media-present emmc") == "yes"
-
     def is_ssh_enabled():
-        return Refactor.run_system_command("/usr/local/bin/is-ssh-enabled") == "yes"
+        return Refactor.run_system_command("/usr/local/bin/is-ssh-enabled") == "true"

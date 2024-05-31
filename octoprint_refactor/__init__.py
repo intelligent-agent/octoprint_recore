@@ -23,11 +23,11 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
     def on_after_startup(self):
         self.settings = self._settings
         self.refactor = Refactor(self.settings)
-        self._logger.info("Refactor plugin!")
+        self._logger.info("Recore plugin!")
 
     def get_settings_defaults(self):
         return {
-            "version_file": "/etc/refactor.version",
+            "version_file": "/etc/rebuild-version",
             "klipper_dir": "/home/debian/klipper"
         }
 
@@ -37,9 +37,6 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
 
     def get_template_vars(self):
         return {
-            "rootfs": Refactor.get_rootfs(),
-            "usb_present": Refactor.is_usb_present(),
-            "emmc_present": Refactor.is_emmc_present()
         }
 
     def get_assets(self):
@@ -54,7 +51,6 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
     def get_api_commands(self):
         return dict(
             get_data=[],
-            change_boot_media=[],
             set_ssh_enabled=["is_enabled"]
         )
 
@@ -63,7 +59,7 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
         if command == "get_data":
             data = {
                 "versions": [ {
-                        "name": "Refactor",
+                        "name": "Rebuild",
                         "version": self.refactor.get_refactor_version()
                     },
                     {
@@ -71,19 +67,9 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
                         "version": self.refactor.get_klipper_version()
                     }
                 ],
-                "boot_media": self.refactor.get_boot_media(),
-                "rootfs": Refactor.get_rootfs(),
-                "usb_present": Refactor.is_usb_present(),
-                "emmc_present": Refactor.is_emmc_present(),
                 "ssh_enabled": Refactor.is_ssh_enabled()
             }
             return flask.jsonify(**data)
-        elif command == "change_boot_media":
-            self.refactor.change_boot_media()
-            status = {
-                "boot_media": self.refactor.get_boot_media()
-            }
-            return flask.jsonify(**status)
         elif command == "set_ssh_enabled":
             is_enabled = data["is_enabled"]
             self.refactor.set_ssh_enabled(is_enabled)
@@ -104,7 +90,7 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
         # for details.
         return {
             "refactor": {
-                "displayName": "Refactor",
+                "displayName": "Recore",
                 "displayVersion": self._plugin_version,
 
                 # version check: github repository

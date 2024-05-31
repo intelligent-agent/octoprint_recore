@@ -1,5 +1,5 @@
-<h4>{{ _('Refactor') }}</h4>
-This tab holds information about the software installed by Refactor. You can use this
+<h4>{{ _('Recore') }}</h4>
+This tab holds information about the software installed on Recore. You can use this
 when asking for help on discord.
 
 <h4>{{ _('Versions') }}</h4>
@@ -18,52 +18,11 @@ when asking for help on discord.
   </tbody>
 </table>
 
-<h4>{{ _('Boot Media') }}</h4>
-Refactor can run from either the internal eMMC drive or from a USB drive.
-In this section, you can choose which drive to boot from.
-<div id="images">
-  <div class="boot-media">
-    <b>eMMC</b><br>
-    <img src="/plugin/refactor/static/img/eMMC.png" /><br>
-    <div style="height: 70px">
-      <div data-bind="text: isEmmcPresent() ? 'Present' : 'Not found'"></div>
-      <div data-bind="if: rootfs() == 'emmc'">
-        <b>Currently running from eMMC</b>
-      </div>
-      <div data-bind="if: bootMedia() == 'emmc'">
-        <b>After a reboot will run from eMMC</b>
-      </div>
-      <div data-bind="if: isEmmcPresent">
-        <div data-bind="ifnot: bootMedia() == 'emmc'">
-          <button class="btn btn-primary" data-bind="click: changeBootMedia">Run from eMMC</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="boot-media">
-    <b>USB drive</b><br>
-    <img src="/plugin/refactor/static/img/USB.png" /><br>
-    <div style="height: 70px">
-      <div data-bind="text: isUsbPresent() ? 'Present' : 'Not found'"></div>
-      <div data-bind="if: rootfs() == 'usb'">
-        <b>Currently running from  USB drive</b>
-      </div>
-      <div data-bind="if: bootMedia() == 'usb'">
-        <b>After a reboot will run from USB drive</b>
-      </div>
-      <div data-bind="if: isUsbPresent">
-        <div data-bind="ifnot: bootMedia() == 'usb'">
-          <button class="btn btn-primary" data-bind="click: changeBootMedia">Run from USB drive</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <h4>{{ _('SSH access to Recore') }}</h4>
 You can enable or disable SSH access to Recore here. SSH access can pose a risk
 if the default password is left unchanged, so as soon as you enable SSH access
-you should log in and set a new password.
+you should log in and set a new password. If the password is still left as the default
+an hour after ssh has been enabled, ssh will be disabled.
 
 <div data-bind="if: isSshEnabled()">
   <b>SSH is currently enabled.</b><br>
