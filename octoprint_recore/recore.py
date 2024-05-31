@@ -4,13 +4,13 @@ import subprocess
 import time
 
 
-class Refactor:
+class Recore:
     def __init__(self, settings):
-        self.refactor_version_file = settings.get(["version_file"])
+        self.recore_version_file = settings.get(["version_file"])
         self.klipper_dir = settings.get(["klipper_dir"])
 
-    def get_refactor_version(self):
-        with open(self.refactor_version_file, "r") as f:
+    def get_recore_version(self):
+        with open(self.recore_version_file, "r") as f:
             version = f.read().replace("\n", "")
             return version
 
@@ -32,4 +32,4 @@ class Refactor:
         os.system(f"sudo /usr/local/bin/set-ssh-access {is_enabled}")
 
     def is_ssh_enabled():
-        return Refactor.run_system_command("/usr/local/bin/is-ssh-enabled") == "true"
+        return Recore.run_system_command("/usr/local/bin/is-ssh-enabled") == "true"

@@ -1,4 +1,4 @@
 include README.md
-recursive-include octoprint_refactor/templates *
-recursive-include octoprint_refactor/translations *
-recursive-include octoprint_refactor/static *
+recursive-include octoprint_recore/templates *
+recursive-include octoprint_recore/translations *
+recursive-include octoprint_recore/static *

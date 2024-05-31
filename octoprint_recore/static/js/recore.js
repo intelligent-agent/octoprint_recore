@@ -1,11 +1,11 @@
 /*
- * View model for OctoPrint-Refactor
+ * View model for OctoPrint-Recore
  *
  * Author: Elias Bakken
  * License: AGPLv3
  */
 $(function() {
-    function RefactorViewModel(parameters) {
+    function RecoreViewModel(parameters) {
         var self = this;
         self.settings = parameters[0];
         self.programVersions = ko.observable();
@@ -32,7 +32,7 @@ $(function() {
         }
         self.runCommand = function(command, params, on_success) {
             $.ajax({
-                url: API_BASEURL + "plugin/refactor",
+                url: API_BASEURL + "plugin/recore",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
@@ -46,8 +46,8 @@ $(function() {
     }
 
     OCTOPRINT_VIEWMODELS.push({
-        construct: RefactorViewModel,
+        construct: RecoreViewModel,
         dependencies: ["settingsViewModel"],
-        elements: ["#tab_plugin_refactor"]
+        elements: ["#tab_plugin_recore"]
     });
 });

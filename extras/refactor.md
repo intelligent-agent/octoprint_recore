@@ -1,8 +1,8 @@
 ---
 layout: plugin
 
-id: refactor
-title: OctoPrint-Refactor
+id: recore
+title: OctoPrint-Recore
 description: TODO
 authors:
 - Elias Bakken
@@ -11,9 +11,9 @@ license: AGPLv3
 # TODO
 date: today's date in format YYYY-MM-DD, e.g. 2015-04-21
 
-homepage: https://github.com/orgs/intelligent-agent/octoprint_refactor
-source: https://github.com/orgs/intelligent-agent/octoprint_refactor
-archive: https://github.com/orgs/intelligent-agent/octoprint_refactor/archive/master.zip
+homepage: https://github.com/orgs/intelligent-agent/octoprint_recore
+source: https://github.com/orgs/intelligent-agent/octoprint_recore
+archive: https://github.com/orgs/intelligent-agent/octoprint_recore/archive/master.zip
 
 # TODO
 # Set this to true if your plugin uses the dependency_links setup parameter to include
@@ -99,4 +99,4 @@ compatibility:
 ---
 
 **TODO**: Longer description of your plugin, configuration examples etc. This part will be visible on the page at
-http://plugins.octoprint.org/plugin/refactor/
+http://plugins.octoprint.org/plugin/recore/

@@ -11,9 +11,9 @@ from __future__ import absolute_import
 
 import octoprint.plugin
 import flask
-from .refactor import Refactor
+from .recore import Recore
 
-class RefactorPlugin(octoprint.plugin.SettingsPlugin,
+class RecorePlugin(octoprint.plugin.SettingsPlugin,
     octoprint.plugin.AssetPlugin,
     octoprint.plugin.TemplatePlugin,
     octoprint.plugin.StartupPlugin,
@@ -22,7 +22,7 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
 
     def on_after_startup(self):
         self.settings = self._settings
-        self.refactor = Refactor(self.settings)
+        self.recore = Recore(self.settings)
         self._logger.info("Recore plugin!")
 
     def get_settings_defaults(self):
@@ -43,9 +43,9 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
         # Define your plugin's asset files to automatically include in the
         # core UI here.
         return {
-            "js": ["js/refactor.js"],
-            "css": ["css/refactor.css"],
-            "less": ["less/refactor.less"]
+            "js": ["js/recore.js"],
+            "css": ["css/recore.css"],
+            "less": ["less/recore.less"]
         }
 
     def get_api_commands(self):
@@ -60,21 +60,21 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
             data = {
                 "versions": [ {
                         "name": "Rebuild",
-                        "version": self.refactor.get_refactor_version()
+                        "version": self.recore.get_recore_version()
                     },
                     {
                         "name": "Klipper",
-                        "version": self.refactor.get_klipper_version()
+                        "version": self.recore.get_klipper_version()
                     }
                 ],
-                "ssh_enabled": Refactor.is_ssh_enabled()
+                "ssh_enabled": Recore.is_ssh_enabled()
             }
             return flask.jsonify(**data)
         elif command == "set_ssh_enabled":
             is_enabled = data["is_enabled"]
-            self.refactor.set_ssh_enabled(is_enabled)
+            self.recore.set_ssh_enabled(is_enabled)
             status = {
-                "ssh_enabled": Refactor.is_ssh_enabled()
+                "ssh_enabled": Recore.is_ssh_enabled()
             }
             return status
 
@@ -89,18 +89,18 @@ class RefactorPlugin(octoprint.plugin.SettingsPlugin,
         # Plugin here. See https://docs.octoprint.org/en/master/bundledplugins/softwareupdate.html
         # for details.
         return {
-            "refactor": {
+            "recore": {
                 "displayName": "Recore",
                 "displayVersion": self._plugin_version,
 
                 # version check: github repository
                 "type": "github_release",
                 "user": "intelligent-agent",
-                "repo": "octoprint_refactor",
+                "repo": "octoprint_recore",
                 "current": self._plugin_version,
 
                 # update method: pip
-                "pip": "https://github.com/intelligent-agent/octoprint_refactor/archive/{target_version}.zip",
+                "pip": "https://github.com/intelligent-agent/octoprint_recore/archive/{target_version}.zip",
             }
         }
 
@@ -113,7 +113,7 @@ __plugin_pythoncompat__ = ">=3,<4" # only python 3
 
 def __plugin_load__():
     global __plugin_implementation__
-    __plugin_implementation__ = RefactorPlugin()
+    __plugin_implementation__ = RecorePlugin()
 
     global __plugin_hooks__
     __plugin_hooks__ = {
